@@ -1,62 +1,46 @@
 # go-ecommerce-mini
 
-Sistema de Gestión de E-Commerce desarrollado en Go como avance del Aprendizaje Autónomo 2.
+Sistema básico de gestión de e-commerce desarrollado en Go como proyecto académico.
 
-## Alcance de esta entrega
+La idea es crear una aplicación de consola que permita administrar productos, clientes, pedidos e inventario, utilizando una estructura modular y una base de datos SQLite local.
 
-Esta versión implementa una CLI funcional con persistencia SQLite local. Incluye:
+## Funcionalidades previstas
 
-- Menú principal y submenús por módulo.
-- CRUD funcional de productos.
-- Registro, búsqueda y listado de clientes.
-- Creación de pedidos, agregado de ítems, cálculo de total y cambio de estado.
-- Control de inventario con verificación de stock, alertas, reposición y reporte ordenado.
-- Persistencia en `ecommerce.db` usando SQLite.
-- Uso de structs, constructores, métodos, interfaces, arrays, slices y maps.
-- Manejo de errores con retornos idiomáticos `error`.
+- Gestión de productos.
+- Registro y consulta de clientes.
+- Creación y seguimiento de pedidos.
+- Control de inventario.
+- Alertas de stock bajo.
+- Menú CLI interactivo.
+- Persistencia con SQLite.
 
-## Requisitos
+## Tecnologías
 
-- Go 1.26.1 o compatible con el proyecto.
-- GCC/CGO habilitado para compilar `github.com/mattn/go-sqlite3`.
+- Go
+- SQLite
 
-## Instalación
-
-```bash
-git clone https://github.com/mateoxav/go-ecommerce-mini.git
-cd go-ecommerce-mini
-go mod tidy
-go run .
-```
-
-## Estructura
+## Estructura prevista
 
 ```text
-main.go
-internal/
-  cli/
-  clientes/
-  inventario/
-  modelos/
-  pedidos/
-  persistencia/
-  productos/
-docs/
+go-ecommerce-mini/
+├── main.go
+├── go.mod
+├── README.md
+├── productos/
+├── clientes/
+├── pedidos/
+├── inventario/
+└── persistencia/
 ```
 
-## Relación con los temas de la unidad
+## Objetivo académico
 
-| Tema | Aplicación |
-|---|---|
-| Arrays | Estados fijos de pedido: pendiente, enviado, entregado, cancelado. |
-| Slices | Listados dinámicos de productos, clientes, pedidos y alertas. |
-| Maps | Enrutamiento del menú CLI y criterios de ordenamiento del inventario. |
-| Structs | Producto, Cliente, Pedido e ItemPedido. |
-| Métodos | Getters, servicios y repositorios con receivers. |
-| Constructores | NuevoProducto, NuevoCliente, NuevoPedido y constructores de servicios/repositorios. |
-| Interfaces | Repositorios desacoplados para aplicar SOLID. |
-| Manejo de errores | Retorno y propagación de `error` con contexto. |
+Este proyecto busca aplicar conceptos básicos de Go, como sintaxis del lenguaje, condicionales, ciclos, funciones, structs, organización por paquetes, manejo de errores y persistencia en una base de datos local.
 
-## Nota sobre clases en Go
+## Estado del proyecto
 
-Go no utiliza clases tradicionales. En este proyecto, los objetos del dominio se representan mediante `structs`, constructores, métodos e interfaces, que permiten aplicar principios de programación orientada a objetos respetando el estilo propio del lenguaje.
+Actualmente el proyecto se encuentra en etapa de planeación y desarrollo inicial. Se están definiendo los módulos, el flujo principal del programa, la arquitectura y el modelo de datos.
+
+## Autor
+
+Mateo Xavier
