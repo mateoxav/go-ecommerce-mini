@@ -3,7 +3,9 @@ package pedidos
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/mateoxav/go-ecommerce-mini/internal/modelos"
 )
@@ -28,6 +30,8 @@ func (r *RepositorioSQLite) Crear(ctx context.Context, pedido modelos.Pedido) er
 }
 
 func (r *RepositorioSQLite) BuscarPorID(ctx context.Context, id string) (modelos.Pedido, error) {
+	id = strings.TrimSpace(id)
+
 	var (
 		pedidoID  string
 		clienteID string
@@ -42,7 +46,7 @@ func (r *RepositorioSQLite) BuscarPorID(ctx context.Context, id string) (modelos
 		WHERE id = ?
 	`, id).Scan(&pedidoID, &clienteID, &total, &estado, &fecha)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return modelos.Pedido{}, fmt.Errorf("pedido no encontrado: %w", err)
 		}
 		return modelos.Pedido{}, fmt.Errorf("buscar pedido: %w", err)
@@ -67,6 +71,14 @@ func (r *RepositorioSQLite) AgregarItem(ctx context.Context, pedidoID string, pr
 		}
 	}()
 
+	var existePedido int
+	if err = tx.QueryRowContext(ctx, `SELECT COUNT(1) FROM pedidos WHERE id = ?`, pedidoID).Scan(&existePedido); err != nil {
+		return fmt.Errorf("verificar pedido: %w", err)
+	}
+	if existePedido == 0 {
+		return fmt.Errorf("pedido no encontrado")
+	}
+
 	var precio float64
 	var stock int
 	err = tx.QueryRowContext(ctx, `
@@ -75,7 +87,7 @@ func (r *RepositorioSQLite) AgregarItem(ctx context.Context, pedidoID string, pr
 		WHERE id = ? AND activo = 1
 	`, productoID).Scan(&precio, &stock)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return fmt.Errorf("producto no encontrado: %w", err)
 		}
 		return fmt.Errorf("consultar producto para pedido: %w", err)
@@ -86,14 +98,6 @@ func (r *RepositorioSQLite) AgregarItem(ctx context.Context, pedidoID string, pr
 	}
 	if stock < cantidad {
 		return fmt.Errorf("stock insuficiente: disponible %d, solicitado %d", stock, cantidad)
-	}
-
-	var existePedido int
-	if err = tx.QueryRowContext(ctx, `SELECT COUNT(1) FROM pedidos WHERE id = ?`, pedidoID).Scan(&existePedido); err != nil {
-		return fmt.Errorf("verificar pedido: %w", err)
-	}
-	if existePedido == 0 {
-		return fmt.Errorf("pedido no encontrado")
 	}
 
 	if _, err = tx.ExecContext(ctx, `

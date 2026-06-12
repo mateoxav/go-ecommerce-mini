@@ -28,11 +28,17 @@ func ReconstruirCliente(id string, nombre string, email string, telefono string,
 	if id == "" {
 		return Cliente{}, errors.New("el id del cliente es obligatorio")
 	}
-	if nombre == "" {
-		return Cliente{}, errors.New("el nombre del cliente es obligatorio")
+	if !ValidarIDCliente(id) {
+		return Cliente{}, ErrorIDClienteInvalido()
+	}
+	if !ValidarNombrePersona(nombre) {
+		return Cliente{}, errors.New("el nombre del cliente es obligatorio y no puede contener números")
 	}
 	if !ValidarEmail(email) {
 		return Cliente{}, errors.New("el email del cliente no tiene un formato válido")
+	}
+	if !ValidarTelefono(telefono) {
+		return Cliente{}, errors.New("el teléfono debe contener solo números y máximo 10 dígitos")
 	}
 	if fechaRegistro == "" {
 		return Cliente{}, errors.New("la fecha de registro es obligatoria")

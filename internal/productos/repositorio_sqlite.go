@@ -3,6 +3,7 @@ package productos
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
 
 	"github.com/mateoxav/go-ecommerce-mini/internal/modelos"
@@ -43,7 +44,7 @@ func (r *RepositorioSQLite) BuscarPorID(ctx context.Context, id string) (modelos
 		WHERE id = ? AND activo = 1
 	`, id).Scan(&productoID, &nombre, &precio, &stock, &categoria, &activo)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return modelos.Producto{}, fmt.Errorf("producto no encontrado: %w", err)
 		}
 		return modelos.Producto{}, fmt.Errorf("buscar producto: %w", err)

@@ -24,6 +24,10 @@ func NuevoServicio(repoProductos RepositorioProductosLecturaEscritura) *Servicio
 }
 
 func (s *Servicio) VerificarStock(ctx context.Context, productoID string, cantidad int) (bool, error) {
+	productoID = strings.TrimSpace(productoID)
+	if !modelos.ValidarIDProducto(productoID) {
+		return false, modelos.ErrorIDProductoInvalido()
+	}
 	if cantidad <= 0 {
 		return false, fmt.Errorf("la cantidad debe ser mayor que cero")
 	}
@@ -57,6 +61,10 @@ func (s *Servicio) AlertasStockBajo(ctx context.Context, umbral int) ([]modelos.
 }
 
 func (s *Servicio) ReponerStock(ctx context.Context, productoID string, cantidad int) error {
+	productoID = strings.TrimSpace(productoID)
+	if !modelos.ValidarIDProducto(productoID) {
+		return modelos.ErrorIDProductoInvalido()
+	}
 	if cantidad <= 0 {
 		return fmt.Errorf("la cantidad a reponer debe ser mayor que cero")
 	}

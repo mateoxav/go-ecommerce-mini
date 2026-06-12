@@ -64,8 +64,14 @@ func ReconstruirPedido(id string, clienteID string, total float64, estado string
 	if id == "" {
 		return Pedido{}, errors.New("el id del pedido es obligatorio")
 	}
+	if !ValidarIDPedido(id) {
+		return Pedido{}, ErrorIDPedidoInvalido()
+	}
 	if clienteID == "" {
 		return Pedido{}, errors.New("el id del cliente es obligatorio")
+	}
+	if !ValidarIDCliente(clienteID) {
+		return Pedido{}, ErrorIDClienteInvalido()
 	}
 	if total < 0 {
 		return Pedido{}, errors.New("el total del pedido no puede ser negativo")
@@ -96,8 +102,14 @@ func ReconstruirItemPedido(id int64, pedidoID string, productoID string, cantida
 	if pedidoID == "" {
 		return ItemPedido{}, errors.New("el id del pedido es obligatorio")
 	}
+	if !ValidarIDPedido(pedidoID) {
+		return ItemPedido{}, ErrorIDPedidoInvalido()
+	}
 	if productoID == "" {
 		return ItemPedido{}, errors.New("el id del producto es obligatorio")
+	}
+	if !ValidarIDProducto(productoID) {
+		return ItemPedido{}, ErrorIDProductoInvalido()
 	}
 	if cantidad <= 0 {
 		return ItemPedido{}, errors.New("la cantidad debe ser mayor que cero")

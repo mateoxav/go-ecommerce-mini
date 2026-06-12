@@ -10,4 +10,5 @@ type Repositorio interface {
 	Crear(ctx context.Context, cliente modelos.Cliente) error
 	BuscarPorID(ctx context.Context, id string) (modelos.Cliente, error)
 	Listar(ctx context.Context) ([]modelos.Cliente, error)
+	EliminarLogico(ctx context.Context, id string) error
 }

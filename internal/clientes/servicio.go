@@ -3,6 +3,7 @@ package clientes
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/mateoxav/go-ecommerce-mini/internal/modelos"
 )
@@ -29,9 +30,21 @@ func (s *Servicio) RegistrarCliente(ctx context.Context, nombre string, email st
 }
 
 func (s *Servicio) BuscarCliente(ctx context.Context, id string) (modelos.Cliente, error) {
+	id = strings.TrimSpace(id)
+	if !modelos.ValidarIDCliente(id) {
+		return modelos.Cliente{}, modelos.ErrorIDClienteInvalido()
+	}
 	return s.repo.BuscarPorID(ctx, id)
 }
 
 func (s *Servicio) ListarClientes(ctx context.Context) ([]modelos.Cliente, error) {
 	return s.repo.Listar(ctx)
+}
+
+func (s *Servicio) EliminarCliente(ctx context.Context, id string) error {
+	id = strings.TrimSpace(id)
+	if !modelos.ValidarIDCliente(id) {
+		return modelos.ErrorIDClienteInvalido()
+	}
+	return s.repo.EliminarLogico(ctx, id)
 }

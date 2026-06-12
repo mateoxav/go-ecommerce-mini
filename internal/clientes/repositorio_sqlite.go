@@ -3,7 +3,9 @@ package clientes
 import (
 	"context"
 	"database/sql"
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/mateoxav/go-ecommerce-mini/internal/modelos"
 )
@@ -18,8 +20,8 @@ func NuevoRepositorioSQLite(db *sql.DB) *RepositorioSQLite {
 
 func (r *RepositorioSQLite) Crear(ctx context.Context, cliente modelos.Cliente) error {
 	_, err := r.db.ExecContext(ctx, `
-		INSERT INTO clientes (id, nombre, email, telefono, fecha_registro)
-		VALUES (?, ?, ?, ?, ?)
+		INSERT INTO clientes (id, nombre, email, telefono, fecha_registro, activo)
+		VALUES (?, ?, ?, ?, ?, 1)
 	`, cliente.ID(), cliente.Nombre(), cliente.Email(), cliente.Telefono(), cliente.FechaRegistro())
 	if err != nil {
 		return fmt.Errorf("crear cliente: %w", err)
@@ -28,6 +30,8 @@ func (r *RepositorioSQLite) Crear(ctx context.Context, cliente modelos.Cliente) 
 }
 
 func (r *RepositorioSQLite) BuscarPorID(ctx context.Context, id string) (modelos.Cliente, error) {
+	id = strings.TrimSpace(id)
+
 	var (
 		clienteID     string
 		nombre        string
@@ -39,10 +43,10 @@ func (r *RepositorioSQLite) BuscarPorID(ctx context.Context, id string) (modelos
 	err := r.db.QueryRowContext(ctx, `
 		SELECT id, nombre, email, telefono, fecha_registro
 		FROM clientes
-		WHERE id = ?
+		WHERE id = ? AND activo = 1
 	`, id).Scan(&clienteID, &nombre, &email, &telefono, &fechaRegistro)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return modelos.Cliente{}, fmt.Errorf("cliente no encontrado: %w", err)
 		}
 		return modelos.Cliente{}, fmt.Errorf("buscar cliente: %w", err)
@@ -60,6 +64,7 @@ func (r *RepositorioSQLite) Listar(ctx context.Context) ([]modelos.Cliente, erro
 	rows, err := r.db.QueryContext(ctx, `
 		SELECT id, nombre, email, telefono, fecha_registro
 		FROM clientes
+		WHERE activo = 1
 		ORDER BY nombre ASC
 	`)
 	if err != nil {
@@ -91,4 +96,26 @@ func (r *RepositorioSQLite) Listar(ctx context.Context) ([]modelos.Cliente, erro
 	}
 
 	return clientes, nil
+}
+
+func (r *RepositorioSQLite) EliminarLogico(ctx context.Context, id string) error {
+	id = strings.TrimSpace(id)
+	resultado, err := r.db.ExecContext(ctx, `
+		UPDATE clientes
+		SET activo = 0
+		WHERE id = ? AND activo = 1
+	`, id)
+	if err != nil {
+		return fmt.Errorf("eliminar cliente: %w", err)
+	}
+
+	filas, err := resultado.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("verificar eliminación de cliente: %w", err)
+	}
+	if filas == 0 {
+		return fmt.Errorf("cliente no encontrado o ya eliminado")
+	}
+
+	return nil
 }

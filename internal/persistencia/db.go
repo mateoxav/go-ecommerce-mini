@@ -41,7 +41,8 @@ func InicializarTablas(db *sql.DB) error {
 			nombre TEXT NOT NULL,
 			email TEXT NOT NULL,
 			telefono TEXT,
-			fecha_registro TEXT NOT NULL
+			fecha_registro TEXT NOT NULL,
+			activo INTEGER NOT NULL DEFAULT 1
 		);`,
 		`CREATE TABLE IF NOT EXISTS pedidos (
 			id TEXT PRIMARY KEY,
@@ -68,7 +69,55 @@ func InicializarTablas(db *sql.DB) error {
 		}
 	}
 
+	if err := asegurarColumnaClientesActivo(db); err != nil {
+		return err
+	}
+
 	return nil
+}
+
+func asegurarColumnaClientesActivo(db *sql.DB) error {
+	columnas, err := columnasDeTabla(db, "clientes")
+	if err != nil {
+		return fmt.Errorf("verificar columnas de clientes: %w", err)
+	}
+	if columnas["activo"] {
+		return nil
+	}
+
+	if _, err := db.Exec(`ALTER TABLE clientes ADD COLUMN activo INTEGER NOT NULL DEFAULT 1`); err != nil {
+		return fmt.Errorf("agregar columna activo a clientes: %w", err)
+	}
+	return nil
+}
+
+func columnasDeTabla(db *sql.DB, tabla string) (map[string]bool, error) {
+	rows, err := db.Query(fmt.Sprintf("PRAGMA table_info(%s)", tabla))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	columnas := make(map[string]bool)
+	for rows.Next() {
+		var (
+			cid          int
+			nombre       string
+			tipo         string
+			noNulo       int
+			valorDefault any
+			pk           int
+		)
+		if err := rows.Scan(&cid, &nombre, &tipo, &noNulo, &valorDefault, &pk); err != nil {
+			return nil, err
+		}
+		columnas[nombre] = true
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return columnas, nil
 }
 
 func CerrarDB(db *sql.DB) error {

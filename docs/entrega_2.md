@@ -30,6 +30,7 @@ El sistema ya permite operar desde consola los módulos principales definidos en
 - Validar email.
 - Buscar cliente por ID.
 - Listar clientes.
+- Eliminar cliente mediante borrado lógico.
 
 ### Pedidos
 
@@ -38,14 +39,23 @@ El sistema ya permite operar desde consola los módulos principales definidos en
 - Descontar stock automáticamente.
 - Calcular total del pedido.
 - Cambiar estado del pedido.
-- Listar pedidos con filtro opcional por estado.
+- Listar pedidos con filtro opcional por estado, usando opciones claras: estado(e) o vacío/todos(v).
 
 ### Inventario
 
 - Verificar stock disponible.
 - Generar alertas de stock bajo.
 - Reponer stock.
-- Generar reporte ordenado por nombre, precio o stock.
+- Generar reporte ordenado por nombre(n), precio(p) o stock(s).
+
+## Mejoras de usabilidad y validación
+
+- La CLI permanece dentro del submenú donde se ejecutó la acción, tanto si ocurre un error como si la operación se completa correctamente.
+- Las entradas se validan campo por campo, evitando repetir todo el formulario cuando solo un dato es incorrecto.
+- Los IDs se validan por prefijo: `CLI-` para clientes, `PROD-` para productos y `PED-` para pedidos.
+- El teléfono del cliente acepta solo números y máximo 10 dígitos.
+- El nombre del cliente no acepta números.
+- Se agregaron tests unitarios para validar nombres, teléfonos y prefijos de ID.
 
 ## Aplicación de estructuras de datos
 
@@ -74,7 +84,5 @@ Go no maneja clases tradicionales, por lo que el sistema usa:
 
 - Mejorar pruebas unitarias.
 - Agregar capturas de ejecución.
-- Refinar validaciones.
 - Preparar video demostrativo.
 - Completar documentación técnica del repositorio.
-- Aplicación web, API y concurrencia.

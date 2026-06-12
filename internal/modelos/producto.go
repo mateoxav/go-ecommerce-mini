@@ -28,6 +28,9 @@ func ReconstruirProducto(id string, nombre string, precio float64, stock int, ca
 	if id == "" {
 		return Producto{}, errors.New("el id del producto es obligatorio")
 	}
+	if !ValidarIDProducto(id) {
+		return Producto{}, ErrorIDProductoInvalido()
+	}
 	if nombre == "" {
 		return Producto{}, errors.New("el nombre del producto es obligatorio")
 	}
