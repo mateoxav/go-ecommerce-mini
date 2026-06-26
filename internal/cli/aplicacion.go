@@ -407,7 +407,6 @@ func (a *Aplicacion) menuInventario(ctx context.Context) error {
 
 func (a *Aplicacion) verificarStock(ctx context.Context) error {
 	productoID := a.leerIDProductoExistente(ctx)
-
 	producto, err := a.servicioProductos.BuscarProducto(ctx, productoID)
 	if err != nil {
 		return err
@@ -424,13 +423,11 @@ func (a *Aplicacion) verificarStock(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-
 	if disponible {
 		fmt.Printf("Hay stock suficiente. Stock disponible actual: %d unidades\n", producto.Stock())
 	} else {
 		fmt.Printf("No hay stock suficiente. Stock disponible actual: %d unidades\n", producto.Stock())
 	}
-
 	return nil
 }
 
